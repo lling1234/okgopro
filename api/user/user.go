@@ -2,14 +2,14 @@
 // Code generated and maintained by GoFrame CLI tool. DO NOT EDIT.
 // =================================================================================
 
-package hello
+package user
 
 import (
 	"context"
 
-	"okgopro/api/hello/v1"
+	"okgopro/api/user/v1"
 )
 
-type IHelloV1 interface {
-	Hello(ctx context.Context, req *v1.HelloReq) (res *v1.HelloRes, err error)
+type IUserV1 interface {
+	SignUp(ctx context.Context, req *v1.SignUpReq) (res *v1.SignUpRes, err error)
 }

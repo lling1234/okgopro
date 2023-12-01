@@ -7,7 +7,8 @@ import (
 	"github.com/gogf/gf/v2/net/ghttp"
 	"github.com/gogf/gf/v2/os/gcmd"
 
-	"okgopro/internal/controller/hello"
+	// "okgopro/internal/controller/hello"
+	usera "okgopro/internal/controller/user"
 )
 
 var (
@@ -18,9 +19,11 @@ var (
 		Func: func(ctx context.Context, parser *gcmd.Parser) (err error) {
 			s := g.Server()
 			s.Group("/", func(group *ghttp.RouterGroup) {
-				group.Middleware(ghttp.MiddlewareHandlerResponse)
+				// group.Middleware(ghttp.MiddlewareHandlerResponse)
 				group.Bind(
-					hello.NewV1(),
+					// hello.NewV1(),
+					usera.NewV1(),
+					
 				)
 			})
 			s.Run()

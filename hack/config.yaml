@@ -1,8 +1,20 @@
 
 # CLI tool, only in development environment.
 # https://goframe.org/pages/viewpage.action?pageId=3673173
+# gfcli:
+#   docker:
+#     build: "-a amd64 -s linux -p temp -ew"
+#     tagPrefixes:
+#       - my.image.pub/my-app
+
 gfcli:
-  docker:
-    build: "-a amd64 -s linux -p temp -ew"
-    tagPrefixes:
-      - my.image.pub/my-app
+  gen:
+    dao:
+    - link:     "mysql:root:lingmysql@tcp(175.178.90.203:3306)/okgonav"
+      tables:   "title_url,user,web_url"
+      jsonCase: "CamelLower"
+
+    - link:   "mysql:root:lingmysql@tcp(175.178.90.203:3306)/okgonav"
+      path:   "./my-app"
+      prefix: "primary_"
+      tables: "user, userDetail"
