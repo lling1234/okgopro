@@ -8,6 +8,14 @@
 全局搜索 ES
 高可用 mongodb Redis
 
+### 资源网
+小刀娱乐网
+https://www.xiaodao1.com/
+我爱资源网
+https://www.52zyw1.com/
+小k网
+https://www.xkwo.com/
+
 ## 前端
 数据显示
 数据分页显示

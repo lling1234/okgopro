@@ -32,6 +32,6 @@ type User struct {
 	UpdateUser    int64       `json:"updateUser"    ` // 更新人
 	UpdateTime    *gtime.Time `json:"updateTime"    ` // 更新时间
 	Status        int         `json:"status"        ` // 状态 2-正常 3-黑名单
-	IsAdmin       int         `json:"isAdmin"       ` // 是否管理员：1-个人用户 2-供应商 3-供应商管理员
+	IsAdmin       int         `json:"isAdmin"       ` // 是否管理员：1-个人用户 2-管理员
 	IsDeleted     int         `json:"isDeleted"     ` // 是否删除：0.正常,1.删除
 }

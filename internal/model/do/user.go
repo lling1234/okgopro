@@ -34,6 +34,6 @@ type User struct {
 	UpdateUser    interface{} // 更新人
 	UpdateTime    *gtime.Time // 更新时间
 	Status        interface{} // 状态 2-正常 3-黑名单
-	IsAdmin       interface{} // 是否管理员：1-个人用户 2-供应商 3-供应商管理员
+	IsAdmin       interface{} // 是否管理员：1-个人用户 2-管理员
 	IsDeleted     interface{} // 是否删除：0.正常,1.删除
 }

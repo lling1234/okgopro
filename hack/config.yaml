@@ -11,7 +11,7 @@ gfcli:
   gen:
     dao:
     - link:     "mysql:root:lingmysql@tcp(175.178.90.203:3306)/okgonav"
-      tables:   "title_url,user,web_url"
+      tables:   "user,title,content"
       jsonCase: "CamelLower"
 
     - link:   "mysql:root:lingmysql@tcp(175.178.90.203:3306)/okgonav"

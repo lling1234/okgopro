@@ -42,7 +42,7 @@ type UserColumns struct {
 	UpdateUser    string // 更新人
 	UpdateTime    string // 更新时间
 	Status        string // 状态 2-正常 3-黑名单
-	IsAdmin       string // 是否管理员：1-个人用户 2-供应商 3-供应商管理员
+	IsAdmin       string // 是否管理员：1-个人用户 2-管理员
 	IsDeleted     string // 是否删除：0.正常,1.删除
 }
 

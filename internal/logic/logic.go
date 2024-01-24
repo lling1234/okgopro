@@ -5,5 +5,6 @@
 package logic
 
 import (
+	_ "okgopro/internal/logic/info"
 	_ "okgopro/internal/logic/user"
 )
