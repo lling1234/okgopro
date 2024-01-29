@@ -7,8 +7,8 @@ import (
 	_ "github.com/gogf/gf/contrib/drivers/mysql/v2"
 	"github.com/gogf/gf/v2/frame/g"
 	"github.com/gogf/gf/v2/os/glog"
-	"github.com/gogf/gf/v2/util/grand"
 	"log"
+	"okgopro/internal/common/utils/snowflake"
 	"okgopro/internal/dao"
 	"strings"
 	"time"
@@ -68,9 +68,6 @@ func (s *sInfo) Get52zyw1(ctx context.Context) {
 
 func (s *sInfo) Getxk(ctx context.Context) {
 
-	strTest := "日曝光1W+ 快手引流获客全套脚本+详细教程"
-	space := strings.TrimSpace(strTest)
-	log.Println(space)
 	log.Println("11111~~~~~~~")
 
 	glog.Info(ctx, "get Getxk https://www.xkwo.com/")
@@ -122,9 +119,12 @@ func (s *sInfo) Getxk(ctx context.Context) {
 		log.Println(ul.Get(i))
 	})
 
+	// 保存到数据库 content表
+	//s.ContentInsterDB(ctx)
+
 	log.Println("end 11")
 }
-func (s *sInfo) GetxkInfoDB(ctx context.Context) {
+func (s *sInfo) UserInsterDB(ctx context.Context) {
 	// 创建 MySQL 连接对象
 	db := g.DB()
 
@@ -134,7 +134,63 @@ func (s *sInfo) GetxkInfoDB(ctx context.Context) {
 		fmt.Println("开启事务失败:", err)
 		return
 	}
-	insert, err := dao.Content.Ctx(ctx).Insert(ctx, "content", g.Map{"id": grand.Intn(9999999999999999), "title": "111"})
+	insert, err := dao.User.DB().Insert(ctx, "user", g.Map{
+		"id":       snowflake.SnowGen.NextVal(),
+		"name":     "111",
+		"password": "111",
+		"phone":    "2222",
+	})
+	if err != nil {
+		panic(err)
+	}
+	err2 := tx.Commit()
+	if err2 != nil {
+		panic(err2)
+	}
+	s.ContentInsterDB(ctx)
+	s.TitleInsterDB(ctx)
+	log.Println("insert", insert)
+}
+
+func (s *sInfo) ContentInsterDB(ctx context.Context) {
+	// 创建 MySQL 连接对象
+	db := g.DB()
+
+	// 开启事务
+	tx, err := db.Begin(ctx)
+	if err != nil {
+		fmt.Println("开启事务失败:", err)
+		return
+	}
+	insert, err := dao.Content.DB().Insert(ctx, "content", g.Map{
+		"id":    snowflake.SnowGen.NextVal(),
+		"title": snowflake.SnowGen.NextVal(),
+		"url":   "2222",
+	})
+	if err != nil {
+		panic(err)
+	}
+	err2 := tx.Commit()
+	if err2 != nil {
+		panic(err2)
+	}
+	log.Println("insert", insert)
+}
+
+func (s *sInfo) TitleInsterDB(ctx context.Context) {
+	// 创建 MySQL 连接对象
+	db := g.DB()
+
+	// 开启事务
+	tx, err := db.Begin(ctx)
+	if err != nil {
+		fmt.Println("开启事务失败:", err)
+		return
+	}
+	insert, err := dao.Title.DB().Insert(ctx, "title", g.Map{
+		"id":   snowflake.SnowGen.NextVal(),
+		"name": "111",
+	})
 	if err != nil {
 		panic(err)
 	}

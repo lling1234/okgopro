@@ -55,7 +55,7 @@ func Test_sInfo_GetxkInfoDB(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			s := &sInfo{}
-			s.GetxkInfoDB(tt.args.ctx)
+			s.UserInsterDB(tt.args.ctx)
 		})
 	}
 }
