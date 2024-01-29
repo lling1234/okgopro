@@ -7,6 +7,7 @@ import (
 	"okgopro/internal/model/do"
 	"okgopro/internal/service"
 
+	_ "github.com/gogf/gf/contrib/drivers/mysql/v2"
 	"github.com/gogf/gf/v2/frame/g"
 	"github.com/gogf/gf/v2/os/gtime"
 	"github.com/gogf/gf/v2/util/grand"
