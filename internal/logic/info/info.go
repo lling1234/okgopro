@@ -9,7 +9,9 @@ import (
 	"github.com/gogf/gf/v2/os/glog"
 	"log"
 	"okgopro/internal/common/utils/snowflake"
+	"okgopro/internal/consts"
 	"okgopro/internal/dao"
+	"okgopro/internal/model/entity"
 	"strings"
 	"time"
 )
@@ -46,11 +48,55 @@ func (s *sInfo) GetXiaodao(ctx context.Context) {
 
 	defer rr.Close()
 
-	fmt.Print(rr.ReadAllString())
+	//fmt.Print(rr.ReadAllString())
 	//	获取当前的日期，例如12-11
 	now := time.Now()
 	day := now.Format("01-02")
 	glog.Info(ctx, day)
+
+	// 使用 goquery 解析 HTML
+	doc, err := goquery.NewDocumentFromReader(rr.Response.Body)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	nrDiv := doc.Find("div.container")
+	find := nrDiv.Find("div.news-article_container")
+	//log.Println(find.Text())
+	ul := find.Find("ul")
+	selection := ul.Children().FilterFunction(func(i int, selections *goquery.Selection) bool {
+		val, _ := selections.Attr("class")
+		return val != "addd"
+	})
+	selection.Each(func(i int, selection *goquery.Selection) {
+		s2 := selection.Find("li a")
+		urlVal, exists := s2.Attr("href")
+		if exists {
+			log.Println(exists)
+		}
+		titleVal, titleErr := s2.Attr("title")
+		if titleErr {
+			log.Println(titleErr)
+		}
+		date := selection.Find("li span").Text()
+
+		log.Println("--------------")
+		log.Println(titleVal)
+		log.Println(urlVal)
+		log.Println(date)
+		log.Println("--------------")
+
+		ContentInsterDB(ctx, entity.Content{
+			Title:     titleVal,
+			Extra:     date,
+			PrefixUrl: consts.WEBURLxiaodao1,
+			Url:       urlVal,
+			Link:      urlVal,
+			WebUrlId:  consts.WEBURLIDxiaodao1,
+		})
+
+	})
+	log.Println("1111111 end")
 
 }
 
@@ -67,7 +113,7 @@ func (s *sInfo) Get52zyw1(ctx context.Context) {
 }
 
 func (s *sInfo) Getxk(ctx context.Context) {
-
+	//TODO  支持通过接口获取  https://www.xkwo.com/media-all?page=2&size=30
 	log.Println("11111~~~~~~~")
 
 	glog.Info(ctx, "get Getxk https://www.xkwo.com/")
@@ -99,16 +145,25 @@ func (s *sInfo) Getxk(ctx context.Context) {
 
 	mediaUl.Find("li a").Each(func(i int, a *goquery.Selection) {
 		log.Println("a 11", a.Text())
-		val, exists := a.Attr("href")
+		urlVal, exists := a.Attr("href")
 		if exists {
-			log.Println("findAHref", val)
+			log.Println("findAHref", urlVal)
 		}
 		findDivCol := a.Find("div.col")
 		findDivTextStr := findDivCol.Find("div.text").Text()
 		findDivText := strings.TrimSpace(findDivTextStr)
-		findDivTime := findDivCol.Find("div.time")
+		findDivTime := findDivCol.Find("div.time").Text()
 		log.Println("findDivText", findDivText)
-		log.Println("findDivTime", findDivTime.Text())
+		log.Println("findDivTime", findDivTime)
+
+		// 保存到数据库 content表
+		ContentInsterDB(ctx, entity.Content{
+			Title:     findDivText,
+			Extra:     findDivTime,
+			PrefixUrl: "https://www.xkwo.com/",
+			Url:       urlVal,
+			WebUrlId:  consts.WEBURLIDxkwo,
+		})
 	})
 	log.Println("------------11")
 
@@ -119,12 +174,9 @@ func (s *sInfo) Getxk(ctx context.Context) {
 		log.Println(ul.Get(i))
 	})
 
-	// 保存到数据库 content表
-	//s.ContentInsterDB(ctx)
-
 	log.Println("end 11")
 }
-func (s *sInfo) UserInsterDB(ctx context.Context) {
+func UserInsterDB(ctx context.Context, in entity.User) {
 	// 创建 MySQL 连接对象
 	db := g.DB()
 
@@ -134,12 +186,12 @@ func (s *sInfo) UserInsterDB(ctx context.Context) {
 		fmt.Println("开启事务失败:", err)
 		return
 	}
-	insert, err := dao.User.DB().Insert(ctx, "user", g.Map{
-		"id":       snowflake.SnowGen.NextVal(),
-		"name":     "111",
-		"password": "111",
-		"phone":    "2222",
-	})
+
+	in.Id = int64(snowflake.SnowGen.NextVal())
+	//Password:okgopro base64:b2tnb3Bybw==
+	in.Password = "b2tnb3Bybw=="
+	in.Phone = "13800138001"
+	insert, err := dao.User.DB().Insert(ctx, "user", in)
 	if err != nil {
 		panic(err)
 	}
@@ -147,12 +199,12 @@ func (s *sInfo) UserInsterDB(ctx context.Context) {
 	if err2 != nil {
 		panic(err2)
 	}
-	s.ContentInsterDB(ctx)
-	s.TitleInsterDB(ctx)
+
 	log.Println("insert", insert)
 }
 
-func (s *sInfo) ContentInsterDB(ctx context.Context) {
+func ContentInsterDB(ctx context.Context, in entity.Content) {
+
 	// 创建 MySQL 连接对象
 	db := g.DB()
 
@@ -162,11 +214,10 @@ func (s *sInfo) ContentInsterDB(ctx context.Context) {
 		fmt.Println("开启事务失败:", err)
 		return
 	}
-	insert, err := dao.Content.DB().Insert(ctx, "content", g.Map{
-		"id":    snowflake.SnowGen.NextVal(),
-		"title": snowflake.SnowGen.NextVal(),
-		"url":   "2222",
-	})
+
+	in.Id = int64(snowflake.SnowGen.NextVal())
+
+	insert, err := dao.Content.DB().Insert(ctx, "content", in)
 	if err != nil {
 		panic(err)
 	}
@@ -177,7 +228,7 @@ func (s *sInfo) ContentInsterDB(ctx context.Context) {
 	log.Println("insert", insert)
 }
 
-func (s *sInfo) TitleInsterDB(ctx context.Context) {
+func TitleInsterDB(ctx context.Context, in entity.Title) {
 	// 创建 MySQL 连接对象
 	db := g.DB()
 
@@ -187,10 +238,9 @@ func (s *sInfo) TitleInsterDB(ctx context.Context) {
 		fmt.Println("开启事务失败:", err)
 		return
 	}
-	insert, err := dao.Title.DB().Insert(ctx, "title", g.Map{
-		"id":   snowflake.SnowGen.NextVal(),
-		"name": "111",
-	})
+
+	in.Id = int64(snowflake.SnowGen.NextVal())
+	insert, err := dao.Title.DB().Insert(ctx, "title", in)
 	if err != nil {
 		panic(err)
 	}
