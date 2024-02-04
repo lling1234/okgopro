@@ -2,11 +2,13 @@ package info
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"github.com/PuerkitoBio/goquery"
 	_ "github.com/gogf/gf/contrib/drivers/mysql/v2"
 	"github.com/gogf/gf/v2/frame/g"
 	"github.com/gogf/gf/v2/os/glog"
+	"github.com/mitchellh/mapstructure"
 	"log"
 	"okgopro/internal/common/utils/snowflake"
 	"okgopro/internal/consts"
@@ -86,7 +88,7 @@ func (s *sInfo) GetXiaodao(ctx context.Context) {
 		log.Println(date)
 		log.Println("--------------")
 
-		ContentInsterDB(ctx, entity.Content{
+		InsterDBContent(ctx, entity.Content{
 			Title:     titleVal,
 			Extra:     date,
 			PrefixUrl: consts.WEBURLxiaodao1,
@@ -157,7 +159,7 @@ func (s *sInfo) Getxk(ctx context.Context) {
 		log.Println("findDivTime", findDivTime)
 
 		// 保存到数据库 content表
-		ContentInsterDB(ctx, entity.Content{
+		InsterDBContent(ctx, entity.Content{
 			Title:     findDivText,
 			Extra:     findDivTime,
 			PrefixUrl: "https://www.xkwo.com/",
@@ -176,7 +178,7 @@ func (s *sInfo) Getxk(ctx context.Context) {
 
 	log.Println("end 11")
 }
-func UserInsterDB(ctx context.Context, in entity.User) {
+func InsterDBUser(ctx context.Context, in entity.User) (err error) {
 	// 创建 MySQL 连接对象
 	db := g.DB()
 
@@ -201,9 +203,10 @@ func UserInsterDB(ctx context.Context, in entity.User) {
 	}
 
 	log.Println("insert", insert)
+	return err
 }
 
-func ContentInsterDB(ctx context.Context, in entity.Content) {
+func InsterDBContent(ctx context.Context, in entity.Content) (err error) {
 
 	// 创建 MySQL 连接对象
 	db := g.DB()
@@ -226,9 +229,10 @@ func ContentInsterDB(ctx context.Context, in entity.Content) {
 		panic(err2)
 	}
 	log.Println("insert", insert)
+	return err
 }
 
-func TitleInsterDB(ctx context.Context, in entity.Title) {
+func InsterDBTitle(ctx context.Context, in entity.Title) (err error) {
 	// 创建 MySQL 连接对象
 	db := g.DB()
 
@@ -249,4 +253,25 @@ func TitleInsterDB(ctx context.Context, in entity.Title) {
 		panic(err2)
 	}
 	log.Println("insert", insert)
+	return err
+}
+
+func QueryDBContent(ctx context.Context, in entity.Content) (err error) {
+	var ctxList []entity.Content
+	err = dao.Content.Ctx(ctx).Page(1, 5).Scan(&ctxList, "")
+	//TODO 结果转换
+	var data []consts.Data
+	err = mapstructure.Decode(ctxList, &data)
+	if err != nil {
+		log.Println(err)
+		return err
+	}
+
+	jsonData, err := json.Marshal(data)
+	log.Println(string(jsonData))
+
+	//TODO 分页
+	//TODO 响应内容拼接
+	log.Println(ctxList[0].Id)
+	return nil
 }
