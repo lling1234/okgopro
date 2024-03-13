@@ -8,6 +8,7 @@ import (
 	_ "github.com/gogf/gf/contrib/drivers/mysql/v2"
 	"github.com/gogf/gf/v2/frame/g"
 	"github.com/gogf/gf/v2/os/glog"
+	"github.com/gogf/gf/v2/os/gtime"
 	"github.com/mitchellh/mapstructure"
 	"log"
 	"okgopro/internal/common/utils/snowflake"
@@ -32,10 +33,15 @@ func New() {
 /**
 小刀娱乐网
 https://www.xiaodao1.com/
-我爱资源网
-https://www.52zyw1.com/
 小k网
 https://www.xkwo.com/
+小黑资源网
+https://www.xiaoheizyw.com/
+可可资源网
+https://www.kekezyw.cn/
+qq好基友
+https://www.qqhjy1.xyz/
+
 **/
 
 func (s *sInfo) GetXiaodao(ctx context.Context) {
@@ -89,12 +95,13 @@ func (s *sInfo) GetXiaodao(ctx context.Context) {
 		log.Println("--------------")
 
 		InsterDBContent(ctx, entity.Content{
-			Title:     titleVal,
-			Extra:     date,
-			PrefixUrl: consts.WEBURLxiaodao1,
-			Url:       urlVal,
-			Link:      urlVal,
-			WebUrlId:  consts.WEBURLIDxiaodao1,
+			Title:      titleVal,
+			Extra:      date,
+			PrefixUrl:  consts.WEBURLxiaodao1,
+			Url:        urlVal,
+			Link:       urlVal,
+			WebUrlId:   consts.WEBURLIDxiaodao1,
+			CreateTime: gtime.Now(),
 		})
 
 	})
@@ -160,11 +167,12 @@ func (s *sInfo) Getxk(ctx context.Context) {
 
 		// 保存到数据库 content表
 		InsterDBContent(ctx, entity.Content{
-			Title:     findDivText,
-			Extra:     findDivTime,
-			PrefixUrl: "https://www.xkwo.com/",
-			Url:       urlVal,
-			WebUrlId:  consts.WEBURLIDxkwo,
+			Title:      findDivText,
+			Extra:      findDivTime,
+			PrefixUrl:  "https://www.xkwo.com/",
+			Url:        urlVal,
+			WebUrlId:   consts.WEBURLIDxkwo,
+			CreateTime: gtime.Now(),
 		})
 	})
 	log.Println("------------11")
@@ -256,15 +264,16 @@ func InsterDBTitle(ctx context.Context, in entity.Title) (err error) {
 	return err
 }
 
-func QueryDBContent(ctx context.Context, in entity.Content) (err error) {
+func QueryDBContent(ctx context.Context, in entity.Content) (r consts.R, err error) {
 	var ctxList []entity.Content
-	err = dao.Content.Ctx(ctx).Page(1, 5).Scan(&ctxList, "")
+
+	err = dao.Content.Ctx(ctx).Scan(&ctxList, in)
 	//TODO 结果转换
 	var data []consts.Data
 	err = mapstructure.Decode(ctxList, &data)
 	if err != nil {
 		log.Println(err)
-		return err
+		return r, err
 	}
 
 	jsonData, err := json.Marshal(data)
@@ -273,5 +282,5 @@ func QueryDBContent(ctx context.Context, in entity.Content) (err error) {
 	//TODO 分页
 	//TODO 响应内容拼接
 	log.Println(ctxList[0].Id)
-	return nil
+	return r, nil
 }

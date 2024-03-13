@@ -2,6 +2,7 @@ package info
 
 import (
 	"context"
+	"fmt"
 	"okgopro/internal/model/entity"
 	"testing"
 )
@@ -75,9 +76,11 @@ func TestQueryDBContent(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if err := QueryDBContent(tt.args.ctx, tt.args.in); (err != nil) != tt.wantErr {
+			dataR, err := QueryDBContent(tt.args.ctx, tt.args.in)
+			if (err != nil) != tt.wantErr {
 				t.Errorf("QueryDBContent() error = %v, wantErr %v", err, tt.wantErr)
 			}
+			fmt.Print(dataR)
 		})
 	}
 }

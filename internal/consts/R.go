@@ -3,9 +3,9 @@ package consts
 import "time"
 
 type R struct {
-	Status  int     `json:"status"`
-	Message string  `json:"message"`
-	Data    []DataR `json:"data"`
+	Status  int         `json:"status"`
+	Message string      `json:"message"`
+	Data    interface{} `json:"data"`
 }
 type Data struct {
 	ID    int    `json:"id"`
